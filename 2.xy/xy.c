@@ -19,6 +19,8 @@ void main( void ){
         waitpadup();
 
         gotoxy( 1, 3 );
+        printf( "      " );
+        gotoxy( 1, 3 );
         if( key == J_A ){
             // A Button
             printf( "A" );
