@@ -1,5 +1,5 @@
 #include <gb/gb.h>
-#include <gb/console.h>
+#include <gbdk/console.h>
 #include <stdint.h>
 #include <stdio.h>
 
@@ -30,19 +30,19 @@ void main( void ){
             printf( "START" );
         }else if( key == J_SELECT ) {
             // SELECT Button
-            gprintf( "SELECT" );
+            printf( "SELECT" );
         }else if( key == J_UP ) {
             // UP Button
-            gprintf( "UP" );
+            printf( "UP" );
         }else if( key == J_DOWN ) {
             // DOWN Button
-            gprintf( "DOWN" );
+            printf( "DOWN" );
         }else if( key == J_LEFT ) {
             // LEFT Button
-            gprintf( "LEFT" );
+            printf( "LEFT" );
         }else if( key == J_RIGHT ) {
             // RIGHT Button
-            gprintf( "RIGHT" );
+            printf( "RIGHT" );
         }
 
         /* In case of user cancellation */
