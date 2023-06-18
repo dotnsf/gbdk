@@ -30,7 +30,7 @@ void clearScreen(){
 void moveTo( uint8_t x, uint8_t y ){
     clearScreen();
     gotoxy( x, y );
-    printf( "X" );
+    printf( "@" );
 }
 
 void main( void ){
