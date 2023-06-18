@@ -3,15 +3,23 @@
 #include <stdint.h>
 #include <stdio.h>
 
-uint8_t min_x = 1, max_x = 10, min_y = 3, max_y = 12;
+#define SIZE 10
+
+#define min_x 1
+#define min_y 3
+#define max_x ( min_x + SIZE - 1 )
+#define max_y ( min_y + SIZE - 1 )
 
 void clearScreen(){
     uint8_t i;
-    char *line = "          ";
+    //char line[] = "          ";
+    char line[SIZE+1];
 
     //. line 生成
-    for( i = min_x; i <= max_x; i ++ ){
+    for( i = 0; i < SIZE; i ++ ){
+        line[i] = ' ';
     }
+    line[SIZE] = NULL;
 
     for( i = min_y; i <= max_y; i ++ ){
         gotoxy( min_x, i );
@@ -33,9 +41,9 @@ void main( void ){
     printf( "move" );
 
     CRITICAL {
-        add_SIO(nowait_int_handler);    // disable waiting VRAM state before return
+        add_SIO(nowait_int_handler);
     }
-    set_interrupts(SIO_IFLAG);          // disable other interrupts. note: this disables sprite movement
+    set_interrupts(SIO_IFLAG);
 
     while( 1 ) {
         key = waitpad( J_A | J_B | J_START | J_SELECT | J_UP | J_DOWN | J_LEFT | J_RIGHT );

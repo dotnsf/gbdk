@@ -10,9 +10,9 @@ void main( void ){
     printf( "Hello World!" );
 
     CRITICAL {
-        add_SIO(nowait_int_handler);    // disable waiting VRAM state before return
+        add_SIO(nowait_int_handler);
     }
-    set_interrupts(SIO_IFLAG);          // disable other interrupts. note: this disables sprite movement
+    set_interrupts(SIO_IFLAG);
 
     while( 1 ) {
         key = waitpad( J_A | J_B | J_START | J_SELECT | J_UP | J_DOWN | J_LEFT | J_RIGHT );
