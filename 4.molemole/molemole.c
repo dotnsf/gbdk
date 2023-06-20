@@ -66,6 +66,15 @@ int items = 0;
 uint8_t current_board[SIZE][SIZE];
 uint8_t pos_x, pos_y;
 
+void cleared( void ){
+    gotoxy( 3, 7 );
+    printf( "        " );
+    gotoxy( 3, 8 );
+    printf( " CLEAR! " );
+    gotoxy( 3, 9 );
+    printf( "        " );
+}
+
 void clearScreen( void ){
     uint8_t i;
     char line[SIZE+3];
@@ -84,9 +93,41 @@ void clearScreen( void ){
     }
 }
 
+int countLeftItems( void ){
+    uint8_t i, j, cnt = 0;
+    for( i = 0; i < SIZE; i ++ ){
+        for( j = 0; j < SIZE; j ++ ){
+            if( current_board[i][j] == 3 ){
+                cnt ++;
+            }
+        }
+    }
+
+	items = cnt;
+	if( cnt == 0 ){
+		if( current_board[pos_y-1][pos_x-1] == 5 ){
+            items = -1;
+		}
+	}
+
+	return cnt;
+}
+
 void displayChar( void ){
     gotoxy( pos_x + 1, pos_y + 3 );
     printf( "@" );
+}
+
+void displayScore( void ){
+    int s, i;
+	
+	countLeftItems();
+    s = stage + 1;
+    i = items;
+    if( i < 0 ){ i = 0; }
+
+    gotoxy( 1, 2 );
+    printf( "%02d         %02d", s, i );
 }
 
 void displayBoard( void ){
@@ -128,8 +169,8 @@ void displayBoard( void ){
 }
 
 void displayStage( void ){
-    //clearScreen();
     displayBoard();
+    displayScore();
     displayChar();
 }
 
@@ -139,7 +180,7 @@ int checkMove( int dir ){  //. dir: 0=UP, 1=RIGHT, 2=DOWN, 3=LEFT
     if( dir == 0 ){
         if( pos_y > 0 && current_board[pos_y][pos_x] == 2 && current_board[pos_y-1][pos_x] != 4 ){
             pos_y --;
-            if( current_board[pos_y][pos_x] != 2 ){
+            if( current_board[pos_y][pos_x] != 2 && current_board[pos_y][pos_x] != 5 ){
                 current_board[pos_y][pos_x] = 0;
             }
 
@@ -156,7 +197,8 @@ int checkMove( int dir ){  //. dir: 0=UP, 1=RIGHT, 2=DOWN, 3=LEFT
         	}
         	
             pos_x ++;
-            if( current_board[pos_y][pos_x] != 2 ){
+            if( current_board[pos_y][pos_x] != 2 && current_board[pos_y][pos_x] != 5 ){
+            	//. ドアの上にくるとここが実行されてしまう？？
                 current_board[pos_y][pos_x] = 0;
             }
 
@@ -183,7 +225,7 @@ int checkMove( int dir ){  //. dir: 0=UP, 1=RIGHT, 2=DOWN, 3=LEFT
         	}
 
             pos_y ++;
-            if( current_board[pos_y][pos_x] != 2 ){
+            if( current_board[pos_y][pos_x] != 2 && current_board[pos_y][pos_x] != 5 ){
                 current_board[pos_y][pos_x] = 0;
             }
         	
@@ -210,7 +252,7 @@ int checkMove( int dir ){  //. dir: 0=UP, 1=RIGHT, 2=DOWN, 3=LEFT
         	}
         	
             pos_x --;
-            if( current_board[pos_y][pos_x] != 2 ){
+            if( current_board[pos_y][pos_x] != 2 && current_board[pos_y][pos_x] != 5 ){
                 current_board[pos_y][pos_x] = 0;
             }
 
@@ -233,28 +275,6 @@ int checkMove( int dir ){  //. dir: 0=UP, 1=RIGHT, 2=DOWN, 3=LEFT
     }
 }
 
-int countLeftItems( void ){
-    uint8_t i, j, cnt = 0;
-    for( i = 0; i < SIZE; i ++ ){
-        for( j = 0; j < SIZE; j ++ ){
-            if( current_board[i][j] == 3 ){
-                cnt ++;
-            }
-        }
-    }
-
-	items = cnt;
-	if( cnt == 0 ){
-		if( current_board[pos_y-1][pos_x-1] == 5 ){
-			return -1;
-		}else{
-			return 0;
-		}
-	}else{
-		return cnt;
-	}
-}
-
 void initStage( void ){
     uint8_t i, j;
     for( i = 0; i < SIZE; i ++ ){
@@ -268,18 +288,18 @@ void initStage( void ){
     displayStage();
 }
 
-void initGame( void ){
-    stage = 0;
+void initGame(){
     initStage();
 }
 
 void main( void ){
     uint8_t key;
-    int dir, chk;
+    int dir;
 
     gotoxy( 2, 1 );
     printf( "MoleMole" );
 
+    stage = 0;
     initGame();
 
     CRITICAL {
@@ -305,7 +325,8 @@ void main( void ){
         	}
         }else if( key == J_B ){
             // B Button
-            //printf( "B" );
+            //. 現在のステージをやり直し
+            initGame();
         }else if( key == J_START ){
             // START Button
             //printf( "START" );
@@ -339,7 +360,7 @@ void main( void ){
                 displayStage();
                 if( countLeftItems() == -1 ){
                     //. ステージクリア
-
+                    cleared();
                 }
             }
         }
