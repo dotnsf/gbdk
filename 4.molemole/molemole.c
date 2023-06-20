@@ -33,30 +33,30 @@ const uint8_t boards[3][SIZE][SIZE] = {
     },
     {
         { 0, 0, 0, 0, 0, 0, 0, 0, 0, 5 },
-        { 2, 4, 4, 4, 4, 4, 4, 4, 4, 2 },
-        { 2, 4, 1, 1, 1, 1, 1, 1, 1, 2 },
-        { 2, 1, 1, 1, 1, 1, 1, 1, 1, 2 },
-        { 2, 1, 1, 1, 1, 1, 1, 1, 1, 2 },
-        { 2, 1, 1, 1, 1, 1, 1, 1, 1, 2 },
-        { 2, 1, 1, 1, 1, 1, 1, 1, 1, 2 },
-        { 2, 1, 1, 1, 1, 1, 1, 1, 1, 2 },
-        { 2, 1, 1, 1, 1, 1, 1, 1, 1, 2 },
-        { 2, 3, 3, 3, 3, 3, 3, 3, 3, 2 }
+        { 1, 4, 4, 4, 4, 4, 4, 4, 4, 2 },
+        { 1, 1, 1, 1, 1, 1, 1, 1, 1, 2 },
+        { 1, 1, 1, 1, 1, 1, 1, 1, 1, 2 },
+        { 1, 1, 1, 1, 1, 1, 1, 1, 1, 2 },
+        { 1, 1, 1, 1, 1, 1, 1, 1, 1, 2 },
+        { 1, 1, 1, 1, 1, 1, 1, 1, 1, 2 },
+        { 1, 1, 1, 1, 1, 1, 1, 1, 1, 2 },
+        { 1, 1, 1, 1, 1, 1, 1, 1, 1, 2 },
+        { 2, 3, 3, 3, 3, 3, 3, 3, 3, 0 }
     },
     {
         { 0, 0, 0, 0, 0, 0, 0, 0, 0, 5 },
         { 1, 4, 4, 4, 4, 4, 4, 4, 4, 2 },
         { 1, 4, 1, 1, 1, 1, 1, 1, 4, 2 },
-        { 1, 4, 1, 0, 0, 0, 0, 1, 4, 2 },
-        { 1, 4, 1, 0, 3, 3, 0, 1, 4, 2 },
         { 1, 4, 1, 0, 1, 1, 0, 1, 4, 2 },
+        { 1, 4, 1, 0, 3, 3, 0, 1, 4, 2 },
         { 1, 4, 1, 1, 1, 1, 1, 1, 4, 2 },
         { 1, 1, 4, 4, 4, 4, 4, 4, 1, 2 },
+        { 1, 1, 1, 1, 1, 1, 1, 1, 1, 2 },
         { 1, 1, 1, 1, 1, 1, 1, 1, 1, 2 },
         { 1, 1, 1, 1, 1, 1, 1, 1, 1, 2 }
     }
 };
-const uint8_t init_positions[SIZE][SIZE] = {
+const uint8_t init_positions[3][2] = {
     { 0, 0 },
     { 0, 0 },
     { 4, 0 }
@@ -65,14 +65,24 @@ uint8_t stage = 0;
 int items = 0;
 uint8_t current_board[SIZE][SIZE];
 uint8_t pos_x, pos_y;
+char *me = "@";
 
 void cleared( void ){
-    gotoxy( 3, 7 );
+    gotoxy( 2, 7 );
     printf( "        " );
-    gotoxy( 3, 8 );
+    gotoxy( 2, 8 );
     printf( " CLEAR! " );
-    gotoxy( 3, 9 );
+    gotoxy( 2, 9 );
     printf( "        " );
+}
+
+void allCleared( void ){
+    gotoxy( 0, 7 );
+    printf( "************" );
+    gotoxy( 0, 8 );
+    printf( "*ALL CLEAR!*" );
+    gotoxy( 0, 9 );
+    printf( "************" );
 }
 
 void clearScreen( void ){
@@ -94,7 +104,9 @@ void clearScreen( void ){
 }
 
 int countLeftItems( void ){
-    uint8_t i, j, cnt = 0;
+    uint8_t i, j;
+	int cnt = 0;
+	
     for( i = 0; i < SIZE; i ++ ){
         for( j = 0; j < SIZE; j ++ ){
             if( current_board[i][j] == 3 ){
@@ -105,7 +117,7 @@ int countLeftItems( void ){
 
 	items = cnt;
 	if( cnt == 0 ){
-		if( current_board[pos_y-1][pos_x-1] == 5 ){
+		if( current_board[pos_y][pos_x] == 5 ){
             items = -1;
 		}
 	}
@@ -115,7 +127,7 @@ int countLeftItems( void ){
 
 void displayChar( void ){
     gotoxy( pos_x + 1, pos_y + 3 );
-    printf( "@" );
+    printf( me );
 }
 
 void displayScore( void ){
@@ -198,12 +210,11 @@ int checkMove( int dir ){  //. dir: 0=UP, 1=RIGHT, 2=DOWN, 3=LEFT
         	
             pos_x ++;
             if( current_board[pos_y][pos_x] != 2 && current_board[pos_y][pos_x] != 5 ){
-            	//. ドアの上にくるとここが実行されてしまう？？
                 current_board[pos_y][pos_x] = 0;
             }
 
             //. Gravity
-            while( pos_y < SIZE - 1 && current_board[pos_y+1][pos_x] == 0 ){
+            while( pos_y < SIZE - 1 && current_board[pos_y][pos_x] != 2 && current_board[pos_y+1][pos_x] == 0 ){
 	        	//. 上が石だった場合
         		if( pos_y > 0 && current_board[pos_y-1][pos_x] == 4 ){
         			current_board[pos_y-1][pos_x] = 0;
@@ -230,7 +241,7 @@ int checkMove( int dir ){  //. dir: 0=UP, 1=RIGHT, 2=DOWN, 3=LEFT
             }
         	
             //. Gravity
-            while( pos_y < SIZE - 1 && current_board[pos_y+1][pos_x] == 0 ){
+            while( pos_y < SIZE - 1 && current_board[pos_y][pos_x] != 2 && current_board[pos_y+1][pos_x] == 0 ){
 	        	//. 上が石だった場合
         		if( pos_y > 0 && current_board[pos_y-1][pos_x] == 4 ){
         			current_board[pos_y-1][pos_x] = 0;
@@ -257,7 +268,7 @@ int checkMove( int dir ){  //. dir: 0=UP, 1=RIGHT, 2=DOWN, 3=LEFT
             }
 
             //. Gravity
-            while( pos_y < SIZE - 1 && current_board[pos_y+1][pos_x] == 0 ){
+            while( pos_y < SIZE - 1 && current_board[pos_y][pos_x] != 2 && current_board[pos_y+1][pos_x] == 0 ){
 	        	//. 上が石だった場合
         		if( pos_y > 0 && current_board[pos_y-1][pos_x] == 4 ){
         			current_board[pos_y-1][pos_x] = 0;
@@ -319,14 +330,22 @@ void main( void ){
 	        		//. 次のステージ
         			stage ++;
         			initGame();
-        		}else{
+        		}else if( stage == 2 ){
         			//. ゲーム終了
+        			stage ++;
+        			allCleared();
+        		}else if( stage == 3 ){
+        			//. 再ゲーム
+        			stage = 0;
+        			initGame();
         		}
         	}
         }else if( key == J_B ){
             // B Button
             //. 現在のステージをやり直し
-            initGame();
+        	if( stage < 3 ){
+            	initGame();
+        	}
         }else if( key == J_START ){
             // START Button
             //printf( "START" );
@@ -358,7 +377,7 @@ void main( void ){
         if( dir != -1 ){
             if( checkMove( dir ) ){
                 displayStage();
-                if( countLeftItems() == -1 ){
+                if( items == -1 ){
                     //. ステージクリア
                     cleared();
                 }
